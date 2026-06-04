@@ -1,0 +1,32 @@
+{
+  "name": "uniway",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^15.2.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "maplibre-gl": "^4.7.1",
+    "pmtiles": "^4.3.0",
+    "postgres": "^3.4.5",
+    "graphology": "^0.25.4",
+    "graphology-shortest-path": "^2.1.0",
+    "zod": "^3.24.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.4",
+    "@types/node": "^22.14.1",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "eslint": "^9.25.0",
+    "eslint-config-next": "^15.2.4",
+    "tailwindcss": "^4.1.4",
+    "typescript": "^5.8.3"
+  }
+}
