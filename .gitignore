@@ -1,2 +1,4 @@
 .next/
 node_modules/
+.pre-commit-config.yaml
+.cz.toml
