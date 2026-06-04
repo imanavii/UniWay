@@ -9,39 +9,51 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  pr-title:
+    name: PR Title Convention
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          PR_TITLE="${{ github.event.pull_request.title }}"
+          if ! echo "$PR_TITLE" | grep -qE '^(feat|fix|chore|refactor|docs|style|test|ci): '; then
+            echo "❌ PR title must follow conventional commits:"
+            echo "   <type>: <description>"
+            echo "   Types: feat, fix, chore, refactor, docs, style, test, ci"
+            exit 1
+          fi
+          echo "✅ PR title follows conventional commits"
+
   lint:
     name: Lint & Typecheck
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
+          bun-version: latest
+      - run: bun install
+      - run: bun run lint
+      - run: bun run typecheck
 
   test:
     name: Tests & Coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run test:coverage
+          bun-version: latest
+      - run: bun install
+      - run: bun run test:coverage
 
   build:
     name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run build
+          bun-version: latest
+      - run: bun install
+      - run: bun run build
