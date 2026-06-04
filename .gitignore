@@ -1,4 +1,8 @@
 .next/
 node_modules/
+coverage/
+tsconfig.tsbuildinfo
 .pre-commit-config.yaml
 .cz.toml
+MEMORY.md
+AGENT.md
