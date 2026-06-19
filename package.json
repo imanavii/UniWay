@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "migrate": "dotenv -e .env.local -- ley up",
+    "migrate:down": "dotenv -e .env.local -- ley down",
+    "db:seed": "dotenv -e .env.local -- bun scripts/seed.ts"
   },
   "dependencies": {
     "@sentry/nextjs": "^10",
@@ -35,6 +38,7 @@
     "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^6.0.2",
     "@vitest/coverage-v8": "^4.1.9",
+    "dotenv-cli": "^11.0.0",
     "eslint": "^10.5.0",
     "eslint-config-next": "^16.2.7",
     "happy-dom": "^20.10.6",
