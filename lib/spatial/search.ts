@@ -7,14 +7,25 @@ const MAX_SEARCH_LIMIT = 50;
 export async function searchPois(
   campusId: string,
   query: string,
-  limit: number = DEFAULT_SEARCH_LIMIT
-): Promise<POISearchResult[]> {
+  limit: number = DEFAULT_SEARCH_LIMIT,
+  offset = 0
+): Promise<{ results: POISearchResult[]; total: number }> {
   const trimmedQuery = query.trim();
   if (trimmedQuery.length === 0) {
-    return [];
+    return { results: [], total: 0 };
   }
 
   const boundedLimit = Math.min(Math.max(limit, 1), MAX_SEARCH_LIMIT);
+
+  const [countRow] = await sql`
+    SELECT COUNT(*) AS total
+    FROM pois p
+    JOIN rooms r ON p.room_id = r.id
+    JOIN buildings b ON r.building_id = b.id
+    WHERE b.campus_id = ${campusId}
+      AND p.search_vector @@ plainto_tsquery('english', ${trimmedQuery})
+  `;
+  const total = Number(countRow?.total ?? 0);
 
   const result = await sql`
     SELECT
@@ -31,7 +42,9 @@ export async function searchPois(
       AND p.search_vector @@ plainto_tsquery('english', ${trimmedQuery})
     ORDER BY rank DESC, p.name ASC
     LIMIT ${boundedLimit}
+    OFFSET ${offset}
   `;
 
-  return result.map((row) => POISearchResultSchema.parse(row));
+  const results = result.map((row: Record<string, unknown>) => POISearchResultSchema.parse(row));
+  return { results, total };
 }

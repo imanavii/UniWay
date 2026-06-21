@@ -12,9 +12,9 @@ describe("Spatial Queries - Search", () => {
     vi.clearAllMocks();
   });
 
-  it("returns empty array for blank query", async () => {
+  it("returns empty result for blank query", async () => {
     const result = await searchPois("123e4567-e89b-12d3-a456-426614174000", "   ");
-    expect(result).toEqual([]);
+    expect(result).toEqual({ results: [], total: 0 });
     expect(sql).not.toHaveBeenCalled();
   });
 
@@ -28,24 +28,28 @@ describe("Spatial Queries - Search", () => {
       rank: 0.12,
     };
 
-    (sql as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce([mockResult]);
+    (sql as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce([{ total: 1 }]); // COUNT
+    (sql as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce([mockResult]); // DATA
 
-    const result = await searchPois(
+    const { results, total } = await searchPois(
       "123e4567-e89b-12d3-a456-426614174000",
       "cs lab"
     );
 
-    expect(result).toHaveLength(1);
-    expect(result[0]?.name).toBe("CS Lab");
-    expect(result[0]?.rank).toBe(0.12);
+    expect(results).toHaveLength(1);
+    expect(results[0]?.name).toBe("CS Lab");
+    expect(results[0]?.rank).toBe(0.12);
+    expect(total).toBe(1);
   });
 
   it("caps the search limit at 50", async () => {
-    (sql as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]);
+    (sql as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce([{ total: 1 }]); // COUNT
+    (sql as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce([]); // DATA
 
-    await searchPois("123e4567-e89b-12d3-a456-426614174000", "lab", 999);
+    const { results } = await searchPois("123e4567-e89b-12d3-a456-426614174000", "lab", 999);
 
-    const sqlCall = (sql as unknown as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect(results).toEqual([]);
+    const sqlCall = (sql as unknown as ReturnType<typeof vi.fn>).mock.calls[1];
     expect(sqlCall).toContain(50);
   });
 });
