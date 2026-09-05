@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { GeoJSONPointSchema, GeoJSONPolygonSchema } from "@/lib/schemas/geojson";
+import { GeoJSONLineStringSchema, GeoJSONPointSchema, GeoJSONPolygonSchema } from "@/lib/schemas/geojson";
 
 // Base Schema for the Campus
 export const CampusSchema = z.object({
@@ -77,19 +77,29 @@ export const RoutingNodesFileSchema = z.object({
 });
 export type RoutingNodesFile = z.infer<typeof RoutingNodesFileSchema>;
 
-// Campus scope is required because node IDs are unique within each campus.
+// Live room-based routing contract. Keep until its consumers migrate together.
 export const RoutingEdgeSchema = z.object({
   id: z.string().uuid(),
+  source_node_id: z.string().uuid(),
+  target_node_id: z.string().uuid(),
+  distance_meters: z.number().positive(),
+  is_accessible: z.boolean(),
+  floor_id: z.string(),
+  geom: GeoJSONLineStringSchema.optional(),
+  edge_type: z.enum(["corridor", "stairs", "elevator", "door"]).optional(),
+});
+export type RoutingEdge = z.infer<typeof RoutingEdgeSchema>;
+
+// QGIS import contract; not yet the storage contract for routing_edges.
+export const QgisRoutingEdgeSchema = RoutingEdgeSchema.extend({
   campus_id: z.string().uuid(),
   source_node_id: RoutingNodeIdSchema,
   target_node_id: RoutingNodeIdSchema,
-  distance_meters: z.number().finite().positive(),
-  is_accessible: z.boolean(),
   floor_id: z.string().trim().min(1),
   geom: RoutingLineStringSchema.nullish(),
   edge_type: z.enum(["corridor", "stairs", "elevator", "door"]),
 });
-export type RoutingEdge = z.infer<typeof RoutingEdgeSchema>;
+export type QgisRoutingEdge = z.infer<typeof QgisRoutingEdgeSchema>;
 
 // POI Schema
 export const POISchema = z.object({
@@ -165,4 +175,3 @@ export const CreateObstructionReportSchema = z.object({
   { message: "Both lng and lat must be provided together" }
 );
 export type CreateObstructionReportInput = z.infer<typeof CreateObstructionReportSchema>;
-

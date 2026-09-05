@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { RoutingEdgeSchema, RoutingNodesFileSchema } from "./db";
+import { QgisRoutingEdgeSchema, RoutingNodesFileSchema } from "./db";
 
 describe("QGIS routing contract", () => {
   it("preserves QGIS IDs and accepts database NULL edge geometry", () => {
@@ -34,11 +34,10 @@ describe("QGIS routing contract", () => {
       geom: null,
       edge_type: "corridor",
     };
-    expect(RoutingEdgeSchema.parse(edge).geom).toBeNull();
-    expect(RoutingEdgeSchema.safeParse({ ...edge, source_node_id: edge.id }).success)
+    expect(QgisRoutingEdgeSchema.parse(edge).geom).toBeNull();
+    expect(QgisRoutingEdgeSchema.safeParse({ ...edge, source_node_id: edge.id }).success)
       .toBe(false);
-    expect(RoutingEdgeSchema.safeParse({ ...edge, distance_meters: 0 }).success)
+    expect(QgisRoutingEdgeSchema.safeParse({ ...edge, distance_meters: 0 }).success)
       .toBe(false);
   });
 });
-
